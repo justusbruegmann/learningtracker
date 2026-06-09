@@ -27,7 +27,7 @@ export async function sessionEnd(id:string) {
     }
 }
 
-export async function getsessionOpen(userid  : string) {
+export async function getSessionOpen(userid  : string) {
     try {
         const openSession = await getOpenSession(userid);
         return openSession;
@@ -45,11 +45,3 @@ export async function getUserSession(userid  : string) {
     }
 }
 
-export async function getSessionOpen(userId  : string) {
-    try {
-        const openSession = await getOpenSession(userId);
-        return openSession;
-    } catch (e) {
-        return false;
-    }
-}

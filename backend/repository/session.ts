@@ -1,6 +1,6 @@
 import {db} from "../app.js"
 import {sessions} from "../drizzle/schema.js";
-import {eq, and} from "drizzle-orm"
+import {eq, and, desc} from "drizzle-orm"
 import {isNull} from "drizzle-orm/sql/expressions/conditions";
 
 export async function createSession(userid: string, title: string) {
@@ -41,13 +41,15 @@ export async function getOpenSession(userid: string) {
         endedAt: sessions.endedAt,
         note: sessions.note,
         durationSecs: sessions.durationSecs,
-    }).from(sessions).where(and(eq(sessions.userId, userid), isNull(sessions.endedAt)));
-    return result;
+    }).from(sessions).where(and(eq(sessions.userId, userid), isNull(sessions.endedAt)))
+        .orderBy(desc(sessions.createdAt)).limit(1);
+    return result[0] ?? null;
 }
 
 export async function getSession(sessionId: string) {
     const result = await db.select({
         id: sessions.id,
+        userId: sessions.userId,
         title: sessions.title,
         createdAt: sessions.createdAt,
         endedAt: sessions.endedAt,

@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors"
 import dotenv from "dotenv";
 import postgres from "postgres";
 import {drizzle} from "drizzle-orm/postgres-js"
@@ -10,6 +11,7 @@ const port = process.env.PORT || 8500
 
 const app = express();
 app.use(express.json());
+app.use(cors()); // allow all origins by default
 
 const connectionString = process.env.DATABASE_URL;
 

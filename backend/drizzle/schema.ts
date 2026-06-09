@@ -21,3 +21,13 @@ export const sessionTags = pgTable('session_tags', {
     sessionId: uuid('session_id').notNull().references(() => sessions.id),
     tagId:     uuid('tag_id').notNull().references(() => tags.id),
 })
+
+export const userSettings = pgTable('user_settings', {
+    id:                  uuid('id').defaultRandom().primaryKey(),
+    userId:              uuid('user_id').notNull().unique(),
+    dailyGoalMins:       integer('daily_goal_mins').notNull().default(90),
+    weeklyGoalMins:      integer('weekly_goal_mins').notNull().default(300),
+    weeklyGoalSessions:  integer('weekly_goal_sessions').notNull().default(5),
+    activeDays:          text('active_days').notNull().default('1,2,3,4,5'),
+    updatedAt:           timestamp('updated_at').notNull().defaultNow(),
+})
