@@ -37,7 +37,7 @@ router.get("/", requireAuth, async (req, res) => {
     }
     try {
         const result = await getUserSettings(userId);
-        return res.status(200).send(result)
+        return res.status(200).send(result ?? { dailyGoalMins: 90, weeklyGoalMins: 300, weeklyGoalSessions: 5, activeDays: '1,2,3,4,5' })
     } catch (e) {
         return res.status(500).send("error")
     }

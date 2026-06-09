@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import {useSettingsStore} from "../stores/settings.ts"
 import HomeView from '../pages/HomeView.vue'
 import {supabase} from "../supabase.ts";
 
@@ -27,6 +28,13 @@ router.beforeEach(async (to) => {
 
   if ((to.path === '/login' || to.path === '/register') && session) {
     return '/dashboard'
+  }
+
+  if (session?.user) {
+    const settings = useSettingsStore()
+    if (!settings.loaded) {
+      await settings.fetchSettings()
+    }
   }
 })
 

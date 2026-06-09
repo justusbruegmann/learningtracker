@@ -23,8 +23,10 @@ const sql = postgres(connectionString);
 export const db = drizzle(sql, {schema})
 
 import session from "./route/session.js";
+import userSettings from "./route/userSettings.js";
 
 app.use("/session", session);
+app.use("/settings", userSettings);
 
 app.get("/", (req, res) => {
     res.send("Hello World!");

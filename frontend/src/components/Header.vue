@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import {Button} from "@/components/ui/button"
 import { useRouter, useRoute } from 'vue-router'
 import { supabase } from '../supabase'
@@ -27,9 +27,14 @@ async function signOut() {
 
         <Button
             variant="link"
-            :class="{ 'underline': route.path === '/session' }"
+            :class="{ 'underline': route.path === '/session/new' }"
             @click="router.push('/session/new')"
-        >Sessions</Button>
+        >Start Session</Button>
+        <Button
+            variant="link"
+            :class="{ 'underline': route.path === '/profile' }"
+            @click="router.push('/profile')"
+        >Profile</Button>
       </nav>
 
       <Button class="mt-2 mr-8 w-24" @click="signOut">Logout</Button>
