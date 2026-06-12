@@ -31,12 +31,12 @@ export const useSettingsStore = defineStore('settings', {
                 return response.status;
             }
             const data = await response.json();
-            this.dailyGoalMins = data[0].dailyGoalMins
-            this.weeklyGoalMins = data[0].weeklyGoalMins
-            this.weeklyGoalSessions = data[0].weeklyGoalSessions
-            this.activeDays = typeof data[0].activeDays === 'string'
-                ? data[0].activeDays.split(',').map(Number)
-                : data[0].activeDays ?? this.activeDays
+            this.dailyGoalMins = data.dailyGoalMins
+            this.weeklyGoalMins = data.weeklyGoalMins
+            this.weeklyGoalSessions = data.weeklyGoalSessions
+            this.activeDays = typeof data.activeDays === 'string'
+                ? data.activeDays.split(',').map(Number)
+                : data.activeDays ?? this.activeDays
             this.loaded = true
         },
         async saveSettings(payload: any) {
