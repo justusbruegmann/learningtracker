@@ -1,0 +1,19 @@
+services:
+  frontend:
+    image: docker.how2centeradiv.de/learningapp/frontend:mvp
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    image: docker.how2centeradiv.de/learningapp/backend:mvp
+    ports:
+      - "3500:3500"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres.vxlzsllewjzphmthuenl:-zvhh4+t$,jYXHN@aws-0-eu-west-1.pooler.supabase.com:6543/postgres
+      SUPABASE_URL: https://vxlzsllewjzphmthuenl.supabase.co
+      SUPABASE_ANON_KEY: sb_publishable_kbjep0THCFP22fXmz1ONTQ_eTmlwuW1
+    restart: unless-stopped
