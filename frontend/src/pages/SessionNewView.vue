@@ -29,7 +29,7 @@ function startTimer() {
 }
 
 function stopTimer() {
-  if (isRunning.value) return
+  if (!isRunning.value) return
   if (intervalId !== undefined) {
     clearInterval(intervalId)
     intervalId = undefined
@@ -38,17 +38,25 @@ function stopTimer() {
 }
 
 function sessionEnd() {
+  const stopLocalTimer = () => {
+    if (intervalId !== undefined) {
+      clearInterval(intervalId)
+      intervalId = undefined
+    }
+    isRunning.value = false
+    elapsedSeconds.value = 0
+  }
+
+  stopLocalTimer()
   openSession(token).then((r) => {
     if (typeof r === "number") {
       return
     }
     const id = r.id;
-    endSession(token, id).then(() => {
-      if (typeof r === "number") {
+    endSession(token, id).then((rr) => {
+      if (typeof rr === "number") {
         return;
       }
-      elapsedSeconds.value = 0
-      isRunning.value = false
     })
   })
 }
@@ -90,8 +98,8 @@ const seconds = computed(() => elapsedSeconds.value % 60)
     </p>
     <div class="flex gap-2">
       <Button @click="startTimer()">Start Time</Button>
-      <Button @click="stopTimer()">Stop Time</Button>
-      <Button @click="sessionEnd()">End Session WIP</Button>
+      <Button @click="stopTimer()">Stop Time WIP</Button>
+      <Button @click="sessionEnd()">End Session</Button>
     </div>
     <RouterLink to="/dashboard" class="text-sm underline text-muted-foreground">Cancel</RouterLink>
   </div>

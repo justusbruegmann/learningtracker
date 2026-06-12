@@ -4,6 +4,9 @@ import {getSessions} from "@/scripts/session.ts";
 import DataPanel from "@/components/DataPanel.vue";
 import WeeklySessionChart from "@/components/WeeklySessionChart.vue";
 
+import {useSettingsStore} from "@/stores/settings";
+import {Progress} from "@/components/ui/progress";
+
 
 const key = Object.keys(localStorage).find(k => k.includes('sb-') && k.includes('-auth-token'))
 const raw = key ? localStorage.getItem(key) : null
@@ -13,6 +16,7 @@ if (!raw) {
 const token = JSON.parse(raw).access_token;
 
 const sessions = ref<any>([])
+const settings = useSettingsStore();
 
 onMounted(() => {
   getSessions(token).then(session => {
@@ -26,7 +30,7 @@ onMounted(() => {
 
 const todaySessions = computed(() => {
   const today = new Date();
-  return sessions.value.filter((session:any) => {
+  return sessions.value.filter((session: any) => {
     const created = new Date(session.createdAt);
     return (
         created.getFullYear() === today.getFullYear() &&
@@ -38,7 +42,7 @@ const todaySessions = computed(() => {
 
 const todayLearningTime = computed(() => {
   let sum: number = 0;
-  todaySessions.value.map((session:any) => {
+  todaySessions.value.map((session: any) => {
     sum += session.durationSecs;
   })
   return sum;
@@ -56,16 +60,24 @@ const weekSessions = computed(() => {
   const endOfToday = new Date(today);
   endOfToday.setHours(23, 59, 59, 999);
 
-  return sessions.value.filter((session:any) => {
+  return sessions.value.filter((session: any) => {
     const created = new Date(session.createdAt);
     return created >= startOfWeek && created <= endOfToday;
   });
 });
 
 const weeklyLearningTime = computed(() => {
-  return weekSessions.value.reduce((sum:any, session:any) => {
+  return weekSessions.value.reduce((sum: any, session: any) => {
     return sum + (session.durationSecs || 0);
   }, 0);
+});
+
+const dailyProgress = computed(() => {
+  return Math.min(100, ((todayLearningTime.value / 60) / settings.dailyGoalMins)*100);
+});
+
+const weeklyProgress = computed(() => {
+  return Math.min(100, ((weeklyLearningTime.value / 60) / settings.weeklyGoalMins)*100);
 });
 
 const weeklyChartData = computed(() => {
@@ -80,7 +92,7 @@ const weeklyChartData = computed(() => {
   const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const totals = [0, 0, 0, 0, 0, 0, 0];
 
-  sessions.value.forEach((session:any) => {
+  sessions.value.forEach((session: any) => {
     const created = new Date(session.createdAt);
     if (created < startOfWeek) return;
 
@@ -93,13 +105,14 @@ const weeklyChartData = computed(() => {
     totals,
   };
 });
+
 </script>
 
 <template>
   <div class="p-6 max-w-4xl mx-auto">
     <h1>Total </h1>
     <section class="mt-4 flex flex-row gap-4">
-      <DataPanel title="Count of sessions today" :label="String(todaySessions.length)"/>
+
       <DataPanel title="Learning time today">
         <template #label>
           <div class="flex items-end gap-1">
@@ -112,6 +125,14 @@ const weeklyChartData = computed(() => {
           </div>
         </template>
       </DataPanel>
+      <DataPanel title="Daily goal Progress">
+        <template #label>
+          <div class="w-full">
+            {{ String(Math.floor(todayLearningTime / 60)) + '/' + String(settings.dailyGoalMins)+ 'min' }}
+            <Progress :model-value="dailyProgress" class="w-full"/>
+          </div>
+        </template>
+      </Datapanel>
       <DataPanel title="Learning time this week">
         <template #label>
           <div class="flex items-end gap-1">
@@ -124,10 +145,18 @@ const weeklyChartData = computed(() => {
           </div>
         </template>
       </DataPanel>
+      <DataPanel title="Weekly goal Progress">
+        <template #label>
+          <div class="w-full">
+            {{ String(Math.floor(weeklyLearningTime / 60)) + '/' + String(settings.weeklyGoalMins)+ 'min' }}
+            <Progress :model-value="weeklyProgress" class="w-full"/>
+          </div>
+        </template>
+      </DataPanel>
     </section>
     <section class="mt-8">
       <h3>This Week</h3>
-      <WeeklySessionChart :labels="weeklyChartData.labels" :values="weeklyChartData.totals" />
+      <WeeklySessionChart :labels="weeklyChartData.labels" :values="weeklyChartData.totals"/>
     </section>
   </div>
 </template>
